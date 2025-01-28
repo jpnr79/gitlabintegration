@@ -42,7 +42,7 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM {
     *
     * @return boolean with the Permission of update
     */
-   static function canCreate() {
+   static function canCreate(): bool {
       return self::canUpdate();
    }
 
@@ -130,7 +130,7 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM {
     *
     * @return void
     */
-   public static function showForm() {
+   public function showForm($ID, array $options = []) {
       echo '<div class="glpi_tabs new_form_tabs">';
       echo '   <div id="tabspanel" class="center-h">';
       echo '      <div class="center vertical ui-tabs ui-widget ui-widget-content ui-corner-all ui-tabs-vertical ui-helper-clearfix ui-corner-left">';

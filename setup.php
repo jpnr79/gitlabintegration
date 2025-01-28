@@ -34,13 +34,13 @@ function plugin_version_gitlabintegration() {
 				 'author'		  => 'Fáiza Letícia Schoeninger',
 				 'license'		  => 'GPLv3+',
 				 'homepage'		  => 'https://github.com/faizaleticia',
-				 'minGlpiVersion' => '9.4'
+				 'minGlpiVersion' => '10.0'
 	);
 }
 
 
 function plugin_gitlabintegration_check_prerequisites() {
-     if (GLPI_VERSION >= 9.4){
+     if (GLPI_VERSION >= 10.0){
          return true;
      } else {
          echo "GLPI version NOT compatible. Requires GLPI >= 9.4";
