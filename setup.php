@@ -34,7 +34,7 @@ function plugin_version_gitlabintegration() {
 				 'author'		  => 'Fáiza Letícia Schoeninger',
 				 'license'		  => 'GPLv3+',
 				 'homepage'		  => 'https://github.com/faizaleticia',
-				 'minGlpiVersion' => '10.0'
+				 'requirements'   => ['glpi' => ['min' => '11.0', 'max' => '12.0']]
 	);
 }
 
