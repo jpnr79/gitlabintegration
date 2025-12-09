@@ -7,7 +7,16 @@ function plugin_gitlabintegration_install() {
 	$config = new Config();
    	$config->setConfigurationValues('plugin:Gitlab Integration', ['configuration' => false]);
 
-   	ProfileRight::addProfileRights(['gitlabintegration:read']);
+   	// Add profile rights only if they don't already exist
+   	$right_name = 'gitlabintegration:read';
+   	$existing = $DB->request([
+      'FROM' => 'glpi_profilerights',
+      'WHERE' => ['name' => $right_name]
+   ])->count();
+   
+   	if ($existing == 0) {
+      	ProfileRight::addProfileRights([$right_name]);
+   	}
 	
 	//instanciate migration with version
 	$migration = new Migration(100);
@@ -60,93 +69,86 @@ function plugin_gitlabintegration_uninstall() {
 function plugin_gitlabintegration_create_integration($DB) {
 	if (!$DB->tableExists('glpi_plugin_gitlab_integration')) {
 	    $query = "CREATE TABLE `glpi_plugin_gitlab_integration` (
-				   `id` INT(11) NOT NULL AUTO_INCREMENT,
-				   `ticket_id` INT(11) NOT NULL,
-				   `gitlab_project_id` INT(11) NOT NULL,
-				   PRIMARY KEY  (`id`)
-				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
-	    $DB->queryOrDie($query, $DB->error());
-
-	    $query = "ALTER TABLE `glpi_plugin_gitlab_integration` 
-	                ADD CONSTRAINT `fk_gitlab_ticket` 
-					FOREIGN KEY (`ticket_id`) REFERENCES `glpi_tickets` (`id`)";
-	    $DB->queryOrDie($query, $DB->error());
+				   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+				   `ticket_id` BIGINT UNSIGNED NOT NULL,
+				   `gitlab_project_id` BIGINT UNSIGNED NOT NULL,
+				   PRIMARY KEY  (`id`),
+				   KEY `ticket_id` (`ticket_id`)
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+	    $DB->doQueryOrDie($query, $DB->error());
 	}
 }
 
 function plugin_gitlabintegration_create_profiles($DB) {
 	if (!$DB->tableExists('glpi_plugin_gitlab_profiles_users')) {
 	    $query = "CREATE TABLE `glpi_plugin_gitlab_profiles_users` (
-				   `id` INT(11) NOT NULL AUTO_INCREMENT,
-				   `profile_id` INT(11) NOT NULL,
-				   `user_id` INT(11) NOT NULL,
-				   `created_at` DATETIME,
-				   PRIMARY KEY (`id`)
-				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
-	    $DB->queryOrDie($query, $DB->error());
-
-	    $query = "ALTER TABLE `glpi_plugin_gitlab_profiles_users` 
-	                ADD CONSTRAINT `fk_gitlab_profile` 
-					FOREIGN KEY (`profile_id`) REFERENCES `glpi_profiles` (`id`)";
-		$DB->queryOrDie($query, $DB->error());
-		
-		$query = "ALTER TABLE `glpi_plugin_gitlab_profiles_users` 
-	                ADD CONSTRAINT `fk_gitlab_user` 
-					FOREIGN KEY (`user_id`) REFERENCES `glpi_users` (`id`)";
-	    $DB->queryOrDie($query, $DB->error());
+				   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+				   `profile_id` INT UNSIGNED NOT NULL,
+				   `user_id` BIGINT UNSIGNED NOT NULL,
+				   `created_at` TIMESTAMP NULL DEFAULT NULL,
+				   PRIMARY KEY (`id`),
+				   KEY `profile_id` (`profile_id`),
+				   KEY `user_id` (`user_id`)
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+	    $DB->doQueryOrDie($query, $DB->error());
 	}
 }
 
 function plugin_gitlabintegration_create_parameters($DB) {
 	if (!$DB->tableExists('glpi_plugin_gitlab_parameters')) {
 	    $query = "CREATE TABLE `glpi_plugin_gitlab_parameters` (
-				   `id` INT(11) NOT NULL AUTO_INCREMENT,
-				   `name` VARCHAR(50) NOT NULL,
+				   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+				   `name` VARCHAR(50) NOT NULL UNIQUE,
 				   `value` VARCHAR(125),
 				   PRIMARY KEY  (`id`)
-				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
-	    $DB->queryOrDie($query, $DB->error());
-
-	    $query = "ALTER TABLE `glpi_plugin_gitlab_parameters` 
-	                ADD CONSTRAINT `uk_name` 
-					UNIQUE (`name`) ";
-	    $DB->queryOrDie($query, $DB->error());
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+	    $DB->doQueryOrDie($query, $DB->error());
 	}
 }
 
 function plugin_gitlabintegration_delete_integration($DB) {
 	if ($DB->tableExists('glpi_plugin_gitlab_integration')) {
 		$drop_count = "DROP TABLE glpi_plugin_gitlab_integration";
-		$DB->query($drop_count); 
+		$DB->doQuery($drop_count); 
 	}
 }
 
 function plugin_gitlabintegration_delete_profiles($DB) {
 	if ($DB->tableExists('glpi_plugin_gitlab_profiles_users')) {
 		$drop_count = "DROP TABLE glpi_plugin_gitlab_profiles_users";
-		$DB->query($drop_count);
+		$DB->doQuery($drop_count);
 	} 
 }
 
 function plugin_gitlabintegration_delete_parameters($DB) {
 	if ($DB->tableExists('glpi_plugin_gitlab_parameters')) {
 		$drop_count = "DROP TABLE glpi_plugin_gitlab_parameters";
-		$DB->query($drop_count);
+		$DB->doQuery($drop_count);
 	} 
 }
 
 function plugin_gitlabintegration_insert_parameters($DB) {
 	if ($DB->tableExists('glpi_plugin_gitlab_parameters')) {
 
-		$ini_array = parse_ini_file("gitlabintegration.ini");
+		$ini_file = GLPI_ROOT . "/plugins/gitlabintegration/gitlabintegration.ini";
+		
+		if (!file_exists($ini_file)) {
+			return;
+		}
+		
+		$ini_array = parse_ini_file($ini_file);
+		
+		if (!is_array($ini_array)) {
+			return;
+		}
 
 		$parameters = [[
 			'name'  => 'gitlab_url',
-			'value' => $ini_array['GITLAB_URL'] == "" ? NULL : $ini_array['GITLAB_URL']
+			'value' => isset($ini_array['GITLAB_URL']) && $ini_array['GITLAB_URL'] != "" ? $ini_array['GITLAB_URL'] : NULL
 		],
 		[
 			'name'  => 'gitlab_token',
-			'value' => $ini_array['GITLAB_TOKEN'] == "" ? NULL : $ini_array['GITLAB_TOKEN']
+			'value' => isset($ini_array['GITLAB_TOKEN']) && $ini_array['GITLAB_TOKEN'] != "" ? $ini_array['GITLAB_TOKEN'] : NULL
 		]];
 		
 		foreach ($parameters as $parameter) {

@@ -4,10 +4,10 @@ include (GLPI_ROOT . "/inc/includes.php");
 
 Session::checkLoginUser();
 
-$selectedProject = (int)$_POST['selectedProject'];
-$ticketId = (int)$_POST['ticketId'];
-$ticketName = $_POST['ticketName'];
-$ticketContent = $_POST['ticketContent'];
+$selectedProject = isset($_POST['selectedProject']) ? (int)$_POST['selectedProject'] : 0;
+$ticketId = isset($_POST['ticketId']) ? (int)$_POST['ticketId'] : 0;
+$ticketName = isset($_POST['ticketName']) ? $_POST['ticketName'] : '';
+$ticketContent = isset($_POST['ticketContent']) ? $_POST['ticketContent'] : '';
 
 $result = $DB->request('glpi_plugin_gitlab_integration', ['ticket_id' => [$ticketId]]);
 

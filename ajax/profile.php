@@ -5,11 +5,11 @@ include (GLPI_ROOT . "/inc/includes.php");
 Session::checkLoginUser();
 
 // Modo: 1 = Insert 0 = Delete
-$modo = (int)$_POST['modo'];
+$modo = isset($_POST['modo']) ? (int)$_POST['modo'] : 0;
 
-$profileId = (int)$_POST['profileId'];
-$userId = (int)$_POST['userId'];
-$id = (int)$_POST['id'];
+$profileId = isset($_POST['profileId']) ? (int)$_POST['profileId'] : 0;
+$userId = isset($_POST['userId']) ? (int)$_POST['userId'] : 0;
+$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
 
 //INSERT
 if ($profileId) {
