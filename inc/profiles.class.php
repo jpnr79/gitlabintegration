@@ -374,11 +374,30 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM {
     */
    private static function getProfilesUsers() {
       global $DB;
-      $result = $DB->request('SELECT `p`.`name` AS `profile`, `u`.`firstname` AS `firstname_user`, 
-                                     `u`.`realname` AS `realname_user`, `pu`.`created_at`, `pu`.`id` 
-                              FROM `glpi_plugin_gitlab_profiles_users` AS `pu`
-                                    LEFT JOIN `glpi_profiles` AS `p` ON (`p`.`id` = `pu`.`profile_id`)
-                                    LEFT JOIN `glpi_users` AS `u` ON (`u`.`id` = `pu`.`user_id`)');
+      $result = $DB->request([
+         'SELECT' => [
+            'p.name AS profile',
+            'u.firstname AS firstname_user',
+            'u.realname AS realname_user',
+            'pu.created_at',
+            'pu.id'
+         ],
+         'FROM' => 'glpi_plugin_gitlab_profiles_users AS pu',
+         'LEFT JOIN' => [
+            'glpi_profiles AS p' => [
+               'ON' => [
+                  'p' => 'id',
+                  'pu' => 'profile_id'
+               ]
+            ],
+            'glpi_users AS u' => [
+               'ON' => [
+                  'u' => 'id',
+                  'pu' => 'user_id'
+               ]
+            ]
+         ]
+      ]);
       return $result;
    }
 
