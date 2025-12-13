@@ -1,0 +1,85 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method PluginGitlabIntegrationProfiles\:\:showForm\(\) invoked with 0 parameters, 1\-2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: front/profiles.form.php
+
+		-
+			message: '#^Static call to instance method PluginGitlabIntegrationProfiles\:\:showForm\(\)\.$#'
+			identifier: method.staticCall
+			count: 1
+			path: front/profiles.form.php
+
+		-
+			message: '#^Call to an undefined static method ProfileRight\:\:deleteProfileRights\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: hook.php
+
+		-
+			message: '#^Instantiated class Config not found\.$#'
+			identifier: class.notFound
+			count: 2
+			path: hook.php
+
+		-
+			message: '#^Call to an undefined static method PluginGitlabIntegrationParameters\:\:ErrorLog\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: inc/gitlabintegration.class.php
+
+		-
+			message: '#^Result of static method PluginGitlabIntegrationGitlabIntegration\:\:getProjects\(\) \(void\) is used\.$#'
+			identifier: staticMethod.void
+			count: 1
+			path: inc/itemform.class.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:printPager\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: inc/profiles.class.php
+
+		-
+			message: '#^Call to an undefined static method Profile\:\:dropdownUnder\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: inc/profiles.class.php
+
+		-
+			message: '#^Path in include_once\(\) "\.\./\.\./\.\./plugins/gitlabintegration/inc/eventlog\.class\.php" is not a file or it does not exist\.$#'
+			identifier: includeOnce.fileNotFound
+			count: 1
+			path: setup.php
+
+		-
+			message: '#^Path in include_once\(\) "\.\./\.\./\.\./plugins/gitlabintegration/inc/gitlabintegration\.class\.php" is not a file or it does not exist\.$#'
+			identifier: includeOnce.fileNotFound
+			count: 1
+			path: setup.php
+
+		-
+			message: '#^Path in include_once\(\) "\.\./\.\./\.\./plugins/gitlabintegration/inc/itemform\.class\.php" is not a file or it does not exist\.$#'
+			identifier: includeOnce.fileNotFound
+			count: 1
+			path: setup.php
+
+		-
+			message: '#^Path in include_once\(\) "\.\./\.\./\.\./plugins/gitlabintegration/inc/menu\.class\.php" is not a file or it does not exist\.$#'
+			identifier: includeOnce.fileNotFound
+			count: 1
+			path: setup.php
+
+		-
+			message: '#^Path in include_once\(\) "\.\./\.\./\.\./plugins/gitlabintegration/inc/parameters\.class\.php" is not a file or it does not exist\.$#'
+			identifier: includeOnce.fileNotFound
+			count: 1
+			path: setup.php
+
+		-
+			message: '#^Path in include_once\(\) "\.\./\.\./\.\./plugins/gitlabintegration/inc/profiles\.class\.php" is not a file or it does not exist\.$#'
+			identifier: includeOnce.fileNotFound
+			count: 1
+			path: setup.php
